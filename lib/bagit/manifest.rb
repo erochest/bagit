@@ -41,6 +41,34 @@ module BagIt
       tagmanifest!
     end
 
+    def quick_md5!
+      manifest_files.each { |f| FileUtils::rm f }
+
+      bag_dir_path = Pathname.new(bag_dir)
+
+      File.open(manifest_file(:md5), 'w') do |f|
+        bag_files.each do |filename|
+          rel_path = Pathname.new(filename).relative_path_from(bag_dir_path).to_s
+          digest   = Digest::MD5.file filename
+          f.write("#{digest} #{rel_path}\n")
+        end
+      end
+    end
+
+    def quick_sha1!
+      manifest_files.each { |f| FileUtils::rm f }
+
+      bag_dir_path = Pathname.new(bag_dir)
+
+      File.open(manifest_file(:sha1), 'w') do |f|
+        bag_files.each do |filename|
+          rel_path = Pathname.new(filename).relative_path_from(bag_dir_path).to_s
+          digest   = Digest::SHA1.file filename
+          f.write("#{digest} #{rel_path}\n")
+        end
+      end
+    end
+
     # All tag files that are bag manifest files (tagmanifest-[algorithm].txt)
     def tagmanifest_files
       files = Dir[File.join(@bag_dir, '*')].select { |f|
