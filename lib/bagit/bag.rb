@@ -56,7 +56,7 @@ module BagIt
     end
 
     # Add a bag file
-    def add_file(base_path, src_path=nil)
+    def add_file(base_path, src_path=nil, defer_update=false)
       path = File.join(data_dir, base_path)
       raise "Bag file exists: #{base_path}" if File.exist? path
       FileUtils::mkdir_p File.dirname(path)
@@ -66,7 +66,7 @@ module BagIt
       else
         f = FileUtils::cp src_path, path
       end
-      write_bag_info
+      write_bag_info unless defer_update
       return f
     end
 
